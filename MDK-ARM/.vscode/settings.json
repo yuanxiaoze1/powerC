@@ -1,0 +1,16 @@
+{
+    "git.ignoreLimitWarning": true,
+    "files.associations": {
+        "string": "cpp",
+        "user_can.h": "c",
+        "limits": "c",
+        "memory": "c",
+        "pid.h": "c",
+        "stdint.h": "c",
+        "ina266.h": "c",
+        "powerconrtol.h": "c",
+        "struct_typedef.h": "c",
+        "i2c.h": "c",
+        "tim.h": "c"
+    }
+}
