@@ -70,3 +70,4 @@
 .\power_c\main.o: C:\Users\31719\AppData\Local\Arm\Packs\ARM\CMSIS-DSP\1.16.2\Include\dsp/filtering_functions.h
 .\power_c\main.o: C:\Users\31719\AppData\Local\Arm\Packs\ARM\CMSIS-DSP\1.16.2\Include\dsp/quaternion_math_functions.h
 .\power_c\main.o: C:\Users\31719\AppData\Local\Arm\Packs\ARM\CMSIS-DSP\1.16.2\Include\dsp/window_functions.h
+.\power_c\main.o: ../MDK-ARM/RLS.h

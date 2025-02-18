@@ -54,7 +54,7 @@ void Power_detect()
     }
 }
 extern float paramVector[3][1];
-fp32 toque_coefficient = 1.99688994e-6f; // (20/16384)*(0.3)*(187/3591)/9.55
+fp32 toque_coefficient = 2.4324e-06; // (20/16384)*(0.3)*(187/3591)/9.55
 
 void Chassis_PowerCtrl() // 新版功率控制 只需要在发送电流前加入即可
 {
@@ -66,10 +66,10 @@ void Chassis_PowerCtrl() // 新版功率控制 只需要在发送电流前加入
 
     fp32 chassis_power = 0.0f;
     fp32 chassis_power_buffer = 0.0f;
-    a = paramVector[1][1];
+    a = fmax(paramVector[1][0], 1e-8);
     // k1
-    fp32 k2 = paramVector[0][1];       // k2
-    fp32 constant = paramVector[2][1]; // constant
+    fp32 k2 = fmax(paramVector[0][0], 1e-8); // k2
+    fp32 constant = paramVector[2][0];       // constant
     max_power_limit = MotorPowerMax;
     chassis_power_buffer = RealBuffer;
     PID_Init(&BufferPid, Buffer_CON * max_power_limit / expectBuffer, 0, 0, 0, 0);

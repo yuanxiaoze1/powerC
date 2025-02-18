@@ -3,7 +3,7 @@ extern SingleMotor motors[1];
 uint32_t CAN_TX_BOX0 = CAN_TX_MAILBOX0;
 extern int state;
 #define ABS(x) ((x) > 0 ? (x) : -(x))
-CONTROL_MODE control_mode = CONTROL_ACCLERATE;
+CONTROL_MODE control_mode = CONTROL_CONSTANT_SPEED;
 void CAN_Init()
 {
   CAN_FilterTypeDef can_filter;

@@ -12,6 +12,7 @@
 ".\power_c\tim.o"
 ".\power_c\stm32f4xx_it.o"
 ".\power_c\stm32f4xx_hal_msp.o"
+".\power_c\rls.o"
 ".\power_c\stm32f4xx_hal_can.o"
 ".\power_c\stm32f4xx_hal_rcc.o"
 ".\power_c\stm32f4xx_hal_rcc_ex.o"

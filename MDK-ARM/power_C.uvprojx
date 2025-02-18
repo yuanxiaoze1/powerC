@@ -612,6 +612,16 @@
               <FileType>1</FileType>
               <FilePath>../Core/Src/stm32f4xx_hal_msp.c</FilePath>
             </File>
+            <File>
+              <FileName>RLS.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\RLS.c</FilePath>
+            </File>
+            <File>
+              <FileName>RLS.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\RLS.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
