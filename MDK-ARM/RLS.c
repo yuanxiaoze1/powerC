@@ -1,6 +1,12 @@
 #include "RLS.h"
 #include "arm_math.h"
+#include "main.h"
+#ifdef __cplusplus
+extern "C" {
+  #endif //   
 
+
+uint8_t RLS_EABLE = 0;
 float paramVector[3][1] = {0};
 float transVector[3][3] = {0.000025, 0, 0,
                            0, 0.000025, 0,
@@ -41,6 +47,7 @@ arm_matrix_instance_f32 KAIN_M_XT_M_TRANSMatrix;
 
 void PowerControl_AutoUpdateParamInit()
 {
+    RLS_EABLE = 1;
     paramVector[0][0] = 1.534e-07; // RPM
     paramVector[1][0] = 1.74e-07;  // Torque
     paramVector[2][0] = 0.78;      // constant
@@ -66,20 +73,22 @@ void PowerControl_AutoUpdateParamInit()
 }
 extern float powerPredict;
 
-float PowerControl_AutoUpdateParam(float x1, float x2, float x3, float y)
+float PowerControl_AutoUpdateParam(float sumPowRPM, float sumPowTorque, float x3, float detaP)
 {
+    if (RLS_EABLE == 0)
+        return -1;
     if (powerPredict < 0)
     {
         return paramVector[0][0] * Xsample[0][0] + paramVector[1][0] * Xsample[1][0] + paramVector[2][0] * Xsample[2][0];
     }
 
-    // x1为 电机速度平方和 x2为电机电流平方和 x3 拟合常数项请输入1 y为因变量功率  effctivePower为机械功率
+    // x1为 电机速度平方和 x2为电机电流平方和 x3 拟合常数项请输入电机数量 y为因变量功率  effctivePower为机械功率
     // 如果使用setCurrent 请保证x2与当前电机实际电流相同 不要将功率控制前的电流拿过来
-    Xsample[0][0] = x1; // 电机速度平方和
-    Xsample[1][0] = x2; // 电机电流平方和
-    Xsample[2][0] = x3; // 常数项
-    Ysample[0][0] = y;  // detaP
-    if (y > 1)
+    Xsample[0][0] = sumPowRPM;    // 电机速度平方和
+    Xsample[1][0] = sumPowTorque; // 电机电流平方和
+    Xsample[2][0] = x3;           // 常数项
+    Ysample[0][0] = detaP;        // detaP
+    if (detaP > 1)
     {
         arm_mat_trans_f32(&XsampleMatrix, &XTMatrix);
         arm_mat_mult_f32(&transMatrix, &XsampleMatrix, &TRANS_M_XMatrix);
@@ -103,3 +112,6 @@ float PowerControl_AutoUpdateParam(float x1, float x2, float x3, float y)
     float deltaPower = paramVector[0][0] * Xsample[0][0] + paramVector[1][0] * Xsample[1][0] + paramVector[2][0] * Xsample[2][0]; // 后验损耗功率
     return deltaPower;
 }
+#ifdef __cplusplus
+}
+#endif // __cplusplus

@@ -40,3 +40,4 @@
 .\power_c\tim.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\inttypes.h
 .\power_c\tim.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
 .\power_c\tim.o: ../MDK-ARM/PowerConrtol.h
+.\power_c\tim.o: ../MDK-ARM/PID.h

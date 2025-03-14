@@ -11,6 +11,11 @@
         "powerconrtol.h": "c",
         "struct_typedef.h": "c",
         "i2c.h": "c",
-        "tim.h": "c"
-    }
+        "tim.h": "c",
+        "rls.h": "c",
+        "expowercontrol.hpp": "c",
+        "math.h": "c",
+        "main.h": "c"
+    },
+    "Codegeex.GenerationPreference": "line by line"
 }

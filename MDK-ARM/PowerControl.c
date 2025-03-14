@@ -7,155 +7,160 @@
 
 #define HEAL_RATE 1
 #define Buffer_CON 10.0f
+#define SacaleTorque
+
 /*************************新版功率控制**************************
 使用转矩电流代替缓冲能量控制
 *********************************************************/
-fp32 templ;
-fp32 b;
-fp32 c;
-fp32 a = 1.74e-07;
-fp32 scaled_give_power[MOTOR_NUM];
-fp32 power_scale;
-float mo;
+PowerController powerController;
+Buffer_Enegy bufferSimulation;
 
-float load[4];
-float input_power = 0; // input power from battery (referee system)
-extern PID BufferPid;
-extern PID pid_V[MOTOR_NUM];
-extern SingleMotor motors[MOTOR_NUM];
-uint16_t MotorPowerMax = 10;
-uint16_t PowerLimit = 10;
-extern float power;
-extern int16_t setCurrent[MOTOR_NUM];
-uint8_t powerCnt;
-float initial_total_power = 0;
-
-fp32 expectBuffer = 5.0f;
-fp32 RealBuffer = 3.0f;
-
-extern uint16_t detaTime;
-
-extern int16_t setV[MOTOR_NUM];
 void Power_detect()
 {
-    if (power > MotorPowerMax)
+    float error = powerController.measurePower - powerController.limitPower;
+    if (error > 0)
     {
-        RealBuffer -= (power - MotorPowerMax) * 0.001 * detaTime;
-        powerCnt = 0;
+        powerController.limitPower -= error * 0.001f;
     }
-    else if (powerCnt++ > MAXBUFFER)
+    else
     {
-        powerCnt = 0;
-        RealBuffer += 0.01f * HEAL_RATE * detaTime;
-        if (RealBuffer > MAXBUFFER)
-        {
-            RealBuffer = MAXBUFFER;
-        }
+        powerController.limitPower += 0.01f;
     }
 }
 extern float paramVector[3][1];
-fp32 toque_coefficient = 2.4324e-06; // (20/16384)*(0.3)*(187/3591)/9.55
+// (20/16384)*(0.3)*(187/3591)/9.55
 
-void Chassis_PowerCtrl() // 新版功率控制 只需要在发送电流前加入即可
+void Chassis_PowerCtrl(SingleMotor motors[MOTOR_NUM], float setCurrent[MOTOR_NUM], int16_t setV[MOTOR_NUM]) // 新版功率控制 只需要在发送电流前加入即可
 {
+    powerController.a = fmaxf(paramVector[1][0], 1e-8);
+    powerController.k2 = fmaxf(paramVector[0][0], 1e-8); // k2
+    powerController.constant = paramVector[2][0];
 
-    initial_total_power = 0;
-    float initial_give_power[MOTOR_NUM]; // initial power from PID calculation
-    float befor_inital[MOTOR_NUM] = {0};
-    uint16_t max_power_limit = 60;
-
-    fp32 chassis_power = 0.0f;
-    fp32 chassis_power_buffer = 0.0f;
-    a = fmax(paramVector[1][0], 1e-8);
-    // k1
-    fp32 k2 = fmax(paramVector[0][0], 1e-8); // k2
-    fp32 constant = paramVector[2][0];       // constant
-    max_power_limit = MotorPowerMax;
-    chassis_power_buffer = RealBuffer;
-    PID_Init(&BufferPid, Buffer_CON * max_power_limit / expectBuffer, 0, 0, 0, 0);
-    PID_SingleCalc(&BufferPid, expectBuffer, chassis_power_buffer);
-    input_power = max_power_limit - BufferPid.output; // Input power floating at maximum power
-    if (input_power <= 5)
-    {
-        input_power = 5;
-    }
-    for (uint8_t i = 0; i < MOTOR_NUM; i++) // first get all the initial motor power and total motor power
-    {
-        befor_inital[i] = setCurrent[i];
-        initial_give_power[i] = setCurrent[i] * toque_coefficient * motors[i].speed +
-                                k2 * motors[i].speed * motors[i].speed +
-                                a * setCurrent[i] * setCurrent[i] + constant;
-
-        if (initial_give_power[i] < 0) // negative power not included (transitory)
-            continue;
-
-        initial_total_power += initial_give_power[i];
-    }
-
-    if (initial_total_power > MotorPowerMax) // determine if larger than max power
-    {
-        power_scale = input_power / initial_total_power;
-        int32_t alltargetspeed = 0;
-
-        for (uint8_t i = 0; i < MOTOR_NUM; i++)
-            alltargetspeed += ABS(setV[i]);
-
-        for (uint8_t i = 0; i < MOTOR_NUM; i++)
-        {
-            scaled_give_power[i] = initial_give_power[i] * power_scale; // get scaled power
-            scaled_give_power[i] *= ABS(setV[i]) * MOTOR_NUM / alltargetspeed;
-            load[i] = scaled_give_power[i] / ABS(motors[i].speed);
-
-            if (scaled_give_power[i] <= 0)
-            {
-                setCurrent[i] = 0;
-                continue;
-            }
-
-            b = toque_coefficient * motors[i].speed;
-            c = k2 * motors[i].speed * motors[i].speed - scaled_give_power[i] + constant;
-            mo = b * b - 4 * a * c;
-
-            if (mo <= 0)
-            {
-                setCurrent[i] = 0;
-                return;
-            }
-
-            if (setCurrent[i] > 0) // Selection of the calculation formula according to the direction of the original moment
-            {
-                templ = (-b + sqrt(mo)) / (2 * a);
-                if (templ > 16000)
-                {
-                    setCurrent[i] = 16000;
-                }
-                else
-                    setCurrent[i] = templ;
-            }
-
-            else
-            {
-                templ = (-b - sqrt(mo)) / (2 * a);
-                if (templ < -16000)
-                {
-                    setCurrent[i] = -16000;
-                }
-                else
-                    setCurrent[i] = templ;
-            }
-        }
-    }
-
+    PID_Init(&powerController.bufferPid, Buffer_CON * powerController.limitPower / powerController.setBuffer, 0, 0, 0, 20);
+    PID_SingleCalc(&powerController.bufferPid, powerController.setBuffer, bufferSimulation.realBuffer);
+    float inputPower = fmaxf(powerController.limitPower - powerController.bufferPid.output, 5.0f); // Input power floating at maximum power
+    float initial_give_power[MOTOR_NUM];
+    float initial_total_power = 0;
     for (uint8_t i = 0; i < MOTOR_NUM; i++)
     {
-        LIMIT(pid_V[i].output, -16000, 16000);
-        // setV[i] = pid_V[i].output;
+        initial_give_power[i] = powerController.toque_coefficient * motors[i].speed * motors[i].torque +
+                                powerController.k2 * motors[i].speed * motors[i].speed +
+                                powerController.a * setCurrent[i] * setCurrent[i] +
+                                powerController.constant;
+        initial_total_power += initial_give_power[i];
     }
-    if (RealBuffer <= 0)
+    if (initial_total_power > inputPower)
     {
-        for (uint8_t i = 0; i < MOTOR_NUM; i++)
+        if (powerController.scalePower_MODEL == SCALE_CURRENT)
         {
-            setCurrent[i] = 0;
+            float scaleSetcurrent = 0;
+            float a0 = 0;
+            float b0 = 0;
+            float c0 = 0;
+            for (uint8_t i = 0; i < 4; i++)
+            {
+                if (initial_give_power[i] < 0)
+                    continue;
+                a0 += powerController.a * setCurrent[i] * setCurrent[i];
+                b0 += powerController.toque_coefficient * setCurrent[i] * motors[i].speed;
+                c0 += powerController.k2 * motors[i].speed * motors[i].speed + powerController.constant;
+            }
+            c0 -= inputPower;
+            float delta = b0 * b0 - 4 * a0 * c0;
+
+            if (delta < 0)
+                scaleSetcurrent = 0;
+            else
+            {
+                float temp1 = (-b0 + sqrt(delta)) / (2 * a0);
+                float temp2 = (-b0 - sqrt(delta)) / (2 * a0);
+                if (temp1 > 0 && temp1 < 1)
+                    scaleSetcurrent = temp1;
+
+                if (temp2 > 0 && temp2 < 1)
+                {
+                    scaleSetcurrent = fmaxf(scaleSetcurrent, temp2);
+                }
+            }
+            if (scaleSetcurrent > 0.0f && scaleSetcurrent < 1.0f)
+            {
+                for (uint8_t i = 0; i < 4; i++)
+                {
+                    if (initial_give_power[i] < 0)
+                        continue;
+                    setCurrent[i] *= scaleSetcurrent;
+                    LIMIT(setCurrent[i], -16000, +16000);
+                }
+                return;
+            }
+        }
+        if (powerController.scalePower_MODEL == SCALE_POWER)
+        {
+
+            float power_scale = inputPower / initial_total_power;
+            float scaled_give_power[MOTOR_NUM];
+            int32_t alltargetspeed = 0;
+
+            for (uint8_t i = 0; i < MOTOR_NUM; i++)
+                alltargetspeed += ABS(setV[i]);
+
+            for (uint8_t i = 0; i < MOTOR_NUM; i++)
+            {
+                scaled_give_power[i] = initial_give_power[i] * power_scale; // get scaled power
+                scaled_give_power[i] *= 1.0f * ABS(setV[i]) * MOTOR_NUM / alltargetspeed;
+                if (scaled_give_power[i] <= 0)
+                {
+                    setCurrent[i] = 0;
+                    continue;
+                }
+                float a = powerController.a;
+
+                float b = powerController.toque_coefficient * motors[i].speed;
+                float c = powerController.k2 * motors[i].speed * motors[i].speed - scaled_give_power[i] + powerController.constant;
+                float mo = b * b - 4 * a * c;
+
+                if (mo < 0)
+                {
+                    setCurrent[i] = 0;
+                    return;
+                }
+
+                if (setCurrent[i] > 0) // Selection of the calculation formula according to the direction of the original moment
+                {
+                    float temp = (-b + sqrt(mo)) / (2 * a);
+                    if (temp > 16000)
+                    {
+                        setCurrent[i] = 16000;
+                    }
+                    else
+                        setCurrent[i] = temp;
+                }
+
+                else
+                {
+                    float temp = (-b - sqrt(mo)) / (2 * a);
+                    if (temp < -16000)
+                    {
+                        setCurrent[i] = -16000;
+                    }
+                    else
+                        setCurrent[i] = temp;
+                }
+            }
         }
     }
+    for (uint8_t i = 0; i < MOTOR_NUM; i++)
+    {
+        LIMIT(setCurrent[i], -16000, 16000);
+    }
+}
+
+void PowerControl_Init(void)
+{
+    powerController.a = 1.74e-07;
+    powerController.k2 = 1.54e-07;
+    powerController.constant = 1.0f;
+    powerController.toque_coefficient = 2.4324e-06;
+    powerController.scalePower_MODEL = SCALE_POWER;
+    powerController.setBuffer = 5.0f;
 }

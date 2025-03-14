@@ -45,6 +45,7 @@
 .\power_c\main.o: ../MDK-ARM/user_can.h
 .\power_c\main.o: ../MDK-ARM/PID.h
 .\power_c\main.o: ../MDK-ARM/PowerConrtol.h
+.\power_c\main.o: ../MDK-ARM/ExPowerControl.h
 .\power_c\main.o: C:\Users\31719\AppData\Local\Arm\Packs\ARM\CMSIS-DSP\1.16.2\Include\arm_math.h
 .\power_c\main.o: C:\Users\31719\AppData\Local\Arm\Packs\ARM\CMSIS-DSP\1.16.2\Include\arm_math_types.h
 .\power_c\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h

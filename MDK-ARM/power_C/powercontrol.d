@@ -1,5 +1,8 @@
 .\power_c\powercontrol.o: PowerControl.c
 .\power_c\powercontrol.o: PowerConrtol.h
+.\power_c\powercontrol.o: PID.h
+.\power_c\powercontrol.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\power_c\powercontrol.o: user_can.h
 .\power_c\powercontrol.o: ../Core/Inc/main.h
 .\power_c\powercontrol.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h
 .\power_c\powercontrol.o: ../Core/Inc/stm32f4xx_hal_conf.h
@@ -8,7 +11,6 @@
 .\power_c\powercontrol.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h
 .\power_c\powercontrol.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h
 .\power_c\powercontrol.o: ../Drivers/CMSIS/Include/core_cm4.h
-.\power_c\powercontrol.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 .\power_c\powercontrol.o: ../Drivers/CMSIS/Include/cmsis_version.h
 .\power_c\powercontrol.o: ../Drivers/CMSIS/Include/cmsis_compiler.h
 .\power_c\powercontrol.o: ../Drivers/CMSIS/Include/cmsis_armcc.h
@@ -34,8 +36,6 @@
 .\power_c\powercontrol.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h
 .\power_c\powercontrol.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h
 .\power_c\powercontrol.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h
-.\power_c\powercontrol.o: pid.h
-.\power_c\powercontrol.o: user_can.h
 .\power_c\powercontrol.o: ../Core/Inc/can.h
 .\power_c\powercontrol.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 .\power_c\powercontrol.o: struct_typedef.h

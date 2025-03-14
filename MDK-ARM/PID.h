@@ -50,19 +50,26 @@ typedef struct _CascadePID
 	DEPID deOuter; // ??????
 	float output;  // ????,??inner.output
 } CascadePID;
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+	void PID_Init(PID *pid, float p, float i, float d, float maxSum, float maxOut);
+	void PID_SingleCalc(PID *pid, float reference, float feedback);
+	void IncrementalPID_CAlC(IPID *pid, float reference, float feedback);
+	void PID_CascadeCalc(CascadePID *pid, float angleRef, float angleFdb, float speedFdb);
+	void PID_Clear(PID *pid);
+	void DEPID_Clear(DEPID *pid);
+	void PID_SetMaxOutput(PID *pid, float maxOut);
+	void PID_SetDeadzone(PID *pid, float deadzone);
+	void DEPID_Init(DEPID *pid, float p, float i, float d, float maxI, float maxOut, float gama);
+	void PIDRegulation(DEPID *vPID, float reference, float feedback, float differentiation);
+	void DEPID_CascadeCalc(CascadePID *pid, float angleRef, float angleFdb, float speedFdb);
+	void PID_CascadeCalc_totalAngle(CascadePID *pid, float angleRef, float angleFdb, float speedFdb);
 
-void PID_Init(PID *pid, float p, float i, float d, float maxSum, float maxOut);
-void PID_SingleCalc(PID *pid, float reference, float feedback);
-void IncrementalPID_CAlC(IPID *pid, float reference, float feedback);
-void PID_CascadeCalc(CascadePID *pid, float angleRef, float angleFdb, float speedFdb);
-void PID_Clear(PID *pid);
-void DEPID_Clear(DEPID *pid);
-void PID_SetMaxOutput(PID *pid, float maxOut);
-void PID_SetDeadzone(PID *pid, float deadzone);
-void DEPID_Init(DEPID *pid, float p, float i, float d, float maxI, float maxOut, float gama);
-void PIDRegulation(DEPID *vPID, float reference, float feedback, float differentiation);
-void DEPID_CascadeCalc(CascadePID *pid, float angleRef, float angleFdb, float speedFdb);
-void PID_CascadeCalc_totalAngle(CascadePID *pid, float angleRef, float angleFdb, float speedFdb);
+	void PID_SingleCalc_totalangle(PID *pid, float reference, float feedback);
+#ifdef __cplusplus
+}
+#endif
 
-void PID_SingleCalc_totalangle(PID *pid, float reference, float feedback);
 #endif

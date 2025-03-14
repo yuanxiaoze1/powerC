@@ -13,21 +13,20 @@ typedef enum
 } CONTROL_MODE;
 typedef struct _MOTOR
 {
-  int16_t angle, speed, torque;
+  int16_t speed, torque;
   int8_t temp;
-
-  int16_t lastAngle; //??????????
+  uint16_t angle;
+  uint16_t lastAngle; //??????????
   int32_t totalAngle; //??????????
 
 } SingleMotor;
 
 void CAN_Init(void);
 void USER_CAN_SetMotorCurrent(CAN_HandleTypeDef *hcans, int16_t StdId, int16_t iq1, int16_t iq2, int16_t iq3, int16_t iq4);
-void Motor_Update(SingleMotor *motor, int16_t angle, int16_t speed, int16_t torque, int8_t temp);
+void Motor_Update(SingleMotor *motor, uint16_t angle, int16_t speed, int16_t torque, int8_t temp);
 void CAN_Rx0Callback(CAN_RxHeaderTypeDef *rx_header, uint8_t *rxdata);
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcans);
 void CAN_Rx0Callback(CAN_RxHeaderTypeDef *rx_header, uint8_t *rxdata);
+void USER_CAN_SetMotorAngle(CAN_HandleTypeDef *hcan, int16_t StdId, int32_t angle, int16_t speedLimit);
 
 #endif
-
-
