@@ -15,7 +15,8 @@
         "rls.h": "c",
         "expowercontrol.hpp": "c",
         "math.h": "c",
-        "main.h": "c"
+        "main.h": "c",
+        "rc.h": "c"
     },
     "Codegeex.GenerationPreference": "line by line"
 }

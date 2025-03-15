@@ -33,9 +33,12 @@
 .\power_c\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h
 .\power_c\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h
 .\power_c\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h
+.\power_c\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h
 .\power_c\main.o: ../Core/Inc/can.h
+.\power_c\main.o: ../Core/Inc/dma.h
 .\power_c\main.o: ../Core/Inc/i2c.h
 .\power_c\main.o: ../Core/Inc/tim.h
+.\power_c\main.o: ../Core/Inc/usart.h
 .\power_c\main.o: ../Core/Inc/gpio.h
 .\power_c\main.o: ../MDK-ARM/bsp_delay.h
 .\power_c\main.o: ../MDK-ARM/struct_typedef.h
@@ -46,10 +49,11 @@
 .\power_c\main.o: ../MDK-ARM/PID.h
 .\power_c\main.o: ../MDK-ARM/PowerConrtol.h
 .\power_c\main.o: ../MDK-ARM/ExPowerControl.h
+.\power_c\main.o: ../MDK-ARM/RC.h
+.\power_c\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 .\power_c\main.o: C:\Users\31719\AppData\Local\Arm\Packs\ARM\CMSIS-DSP\1.16.2\Include\arm_math.h
 .\power_c\main.o: C:\Users\31719\AppData\Local\Arm\Packs\ARM\CMSIS-DSP\1.16.2\Include\arm_math_types.h
 .\power_c\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
-.\power_c\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 .\power_c\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\float.h
 .\power_c\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\limits.h
 .\power_c\main.o: C:\Users\31719\AppData\Local\Arm\Packs\ARM\CMSIS-DSP\1.16.2\Include\arm_math_memory.h
